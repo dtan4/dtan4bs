@@ -2,6 +2,7 @@ package generator
 
 import (
 	"io/ioutil"
+	"os"
 	"path"
 
 	"github.com/pkg/errors"
@@ -30,7 +31,14 @@ func (g *Generator) Generate(filename, dir string, metadata map[string]string) e
 		return errors.Wrapf(err, "template of %q is not found", filename)
 	}
 
-	fp := path.Join(g.baseDir, dir, filename)
+	d := path.Join(g.baseDir, dir)
+	if _, err := os.Stat(d); os.IsNotExist(err) {
+		if err2 := os.MkdirAll(d, 0755); err2 != nil {
+			return errors.Wrapf(err2, "failed to create %q", d)
+		}
+	}
+
+	fp := path.Join(d, filename)
 
 	if err := ioutil.WriteFile(fp, data, 0644); err != nil {
 		return errors.Wrapf(err, "failed to create %q", fp)

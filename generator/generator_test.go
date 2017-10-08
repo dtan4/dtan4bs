@@ -50,6 +50,11 @@ func TestGenerate(t *testing.T) {
 			dir:      "",
 			metadata: map[string]string{},
 		},
+		{
+			filename: "README.md",
+			dir:      "foo",
+			metadata: map[string]string{},
+		},
 	}
 
 	for _, tc := range testcases {
@@ -58,6 +63,53 @@ func TestGenerate(t *testing.T) {
 		}
 
 		fp := path.Join(baseDir, tc.dir, tc.filename)
+
+		s, err := os.Stat(fp)
+		if os.IsNotExist(err) {
+			t.Errorf("%s was not created: %s", fp, err)
+			continue
+		}
+
+		if s.IsDir() {
+			t.Errorf("%s is not a file", fp)
+		}
+	}
+}
+
+func TestGenerate_baseDir_notExists(t *testing.T) {
+	baseDir, err := ioutil.TempDir("", "dtan4bs-generator-generate")
+	if err != nil {
+		t.Fatalf("cannot create tempdir: %s", err)
+	}
+	defer os.RemoveAll(baseDir)
+
+	g := &Generator{
+		baseDir: path.Join(baseDir, "foobar"),
+	}
+
+	testcases := []struct {
+		filename string
+		dir      string
+		metadata map[string]string
+	}{
+		{
+			filename: "README.md",
+			dir:      "",
+			metadata: map[string]string{},
+		},
+		{
+			filename: "README.md",
+			dir:      "foo",
+			metadata: map[string]string{},
+		},
+	}
+
+	for _, tc := range testcases {
+		if err := g.Generate(tc.filename, tc.dir, tc.metadata); err != nil {
+			t.Errorf("error should not be raised: %s", err)
+		}
+
+		fp := path.Join(baseDir, "foobar", tc.dir, tc.filename)
 
 		s, err := os.Stat(fp)
 		if os.IsNotExist(err) {
