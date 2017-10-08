@@ -1,5 +1,5 @@
-NAME     := s3url
-VERSION  := v1.0.0
+NAME     := dtan4bs
+VERSION  := v0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS     := $(shell find . -type f -name '*.go')
