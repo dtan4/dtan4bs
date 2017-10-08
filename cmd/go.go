@@ -1,39 +1,51 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
-
-
 package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
+	"github.com/dtan4/dtan4bs/generator"
+
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+)
+
+var (
+	goFiles = []string{
+		"LICENSE",
+		"README.md",
+		"main.go",
+	}
 )
 
 // goCmd represents the go command
 var goCmd = &cobra.Command{
 	Use:   "go",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Generate Go project template",
+	RunE:  doGo,
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("go called")
-	},
+func doGo(cmd *cobra.Command, args []string) error {
+	// TODO: set baseDir via option
+	baseDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return errors.Wrap(err, "failed to get current directory")
+	}
+
+	g := generator.NewGenerator(baseDir)
+
+	for _, filename := range goFiles {
+		if err := g.Generate(filename, "", map[string]string{}); err != nil {
+			return errors.Wrap(err, "failed to generate Go project files")
+		}
+	}
+
+	fmt.Println("successfully generated")
+
+	return nil
 }
 
 func init() {
 	RootCmd.AddCommand(goCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// goCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// goCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
