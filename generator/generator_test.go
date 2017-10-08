@@ -51,6 +51,17 @@ func TestGenerate(t *testing.T) {
 			metadata: map[string]string{},
 		},
 		{
+			filename: "main.go",
+			dir:      "",
+			metadata: map[string]string{},
+		},
+		{
+			filename: "LICENSE",
+			dir:      "",
+			metadata: map[string]string{},
+		},
+
+		{
 			filename: "README.md",
 			dir:      "foo",
 			metadata: map[string]string{},
