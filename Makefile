@@ -11,6 +11,7 @@ DIST_DIRS := find * -type d -exec
 .DEFAULT_GOAL := bin/$(NAME)
 
 bin/$(NAME): $(SRCS)
+	go generate $(NOVENDOR)
 	go build $(LDFLAGS) -o bin/$(NAME)
 
 .PHONY: ci-test
@@ -46,7 +47,7 @@ ifeq ($(shell command -v dep 2> /dev/null),)
 endif
 
 .PHONY: deps
-deps: dep
+deps: dep go-bindata
 	dep ensure -v
 
 .PHONY: dist
@@ -58,8 +59,14 @@ dist:
 	$(DIST_DIRS) zip -r $(NAME)-$(VERSION)-{}.zip {} \; && \
 	cd ..
 
+.PHONY: go-bindata
+ifeq ($(shell command -v go-bindata 2> /dev/null),)
+	go get -u -v github.com/jteeuwen/go-bindata/...
+endif
+
 .PHONY: install
 install:
+	go generate $(NOVENDOR)
 	go install $(LDFLAGS)
 
 .PHONY: release
@@ -69,6 +76,7 @@ release:
 
 .PHONY: test
 test:
+	go generate $(NOVENDOR)
 	go test -cover -v $(NOVENDOR)
 
 .PHONY: update-deps
