@@ -24,4 +24,3 @@ vendor/
 
 bin/
 dist/
-bindata.go
